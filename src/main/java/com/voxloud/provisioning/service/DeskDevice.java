@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -13,8 +14,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import static com.voxloud.provisioning.service.ImportantField.CODECS;
+
 @Component
-public class DeskGenerator implements DeviceInterface {
+public class DeskDevice implements DeviceInterface {
 
     private final String format = "%s=%s";
 
@@ -29,8 +32,21 @@ public class DeskGenerator implements DeviceInterface {
 
         Properties properties = new Properties();
         properties.load(new StringReader(string));
+
         Map<String, Object> map = new HashMap<>();
-        properties.forEach((o,o2) -> map.put((String) o, o2));
+        for (Map.Entry<Object, Object> entry : properties.entrySet()) {
+            Object k = entry.getKey();
+            Object v = entry.getValue();
+            if (CODECS.equals(k)) {
+                String tmp = (String) v;
+                if (!tmp.isEmpty()) {
+                    List<String> list = Arrays.asList(tmp.split(","));
+                    map.put((String) k, list);
+                }
+                continue;
+            }
+            map.put((String) k, v);
+        }
         return map;
     }
 
@@ -50,5 +66,10 @@ public class DeskGenerator implements DeviceInterface {
         }
 
         return String.join("\n", values);
+    }
+
+    @Override
+    public String contentType() {
+        return "text/plain";
     }
 }

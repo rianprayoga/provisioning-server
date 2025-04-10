@@ -4,9 +4,8 @@ import com.voxloud.provisioning.entity.Device;
 import com.voxloud.provisioning.errors.http.InternalServerErrorException;
 import com.voxloud.provisioning.errors.http.NotFoundException;
 import com.voxloud.provisioning.repository.DeviceRepository;
+import com.voxloud.provisioning.service.model.Provisioning;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
 
 @Service
 public class ProvisioningServiceImpl implements ProvisioningService {
@@ -22,7 +21,7 @@ public class ProvisioningServiceImpl implements ProvisioningService {
         this.fileGenerator = fileGenerator;
     }
 
-    public String getProvisioningFile(String macAddress) {
+    public Provisioning getProvisioningFile(String macAddress) {
 
         Device device = deviceRepository
                 .findById(macAddress)
@@ -32,10 +31,10 @@ public class ProvisioningServiceImpl implements ProvisioningService {
         return generateConfig(device);
     }
 
-    private String generateConfig(Device device){
+    private Provisioning generateConfig(Device device){
         try{
             return fileGenerator.generateConfig(device);
-        }catch (IOException e){
+        }catch (Exception e){
             throw new InternalServerErrorException("An unexpected error occurred.");
         }
     }

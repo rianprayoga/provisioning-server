@@ -9,11 +9,11 @@ import java.util.Collections;
 import java.util.Map;
 
 @Component
-public class ConferenceGenerator implements DeviceInterface {
+public class ConferenceDevice implements DeviceInterface {
 
     private final ObjectMapper objectMapper;
 
-    public ConferenceGenerator(ObjectMapper objectMapper) {
+    public ConferenceDevice(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
@@ -32,5 +32,10 @@ public class ConferenceGenerator implements DeviceInterface {
     @Override
     public String createFile(Map<String, Object> data) throws JsonProcessingException {
         return objectMapper.writeValueAsString(data);
+    }
+
+    @Override
+    public String contentType() {
+        return "application/json";
     }
 }

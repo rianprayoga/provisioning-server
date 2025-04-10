@@ -1,6 +1,8 @@
 package com.voxloud.provisioning.service;
 
+import com.voxloud.provisioning.service.model.Provisioning;
+
 public interface ProvisioningService {
 
-    String getProvisioningFile(String macAddress);
+    Provisioning getProvisioningFile(String macAddress);
 }

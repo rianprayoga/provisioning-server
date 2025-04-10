@@ -2,9 +2,11 @@ package com.voxloud.provisioning.service;
 
 import com.voxloud.provisioning.config.DefaultConfig;
 import com.voxloud.provisioning.entity.Device;
+import com.voxloud.provisioning.service.model.Provisioning;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +31,7 @@ public class FileGenerator {
                 .collect(Collectors.toMap(DeviceInterface::model, Function.identity()));
     }
 
-    public String generateConfig(Device device) throws IOException {
+    public Provisioning generateConfig(Device device) throws IOException {
 
         Map<String, Object> currentValue = new HashMap<>();
         currentValue.put(USERNAME, device.getUsername());
@@ -57,14 +59,17 @@ public class FileGenerator {
         });
 
         currentValue.compute(CODECS, (k,v) -> {
-            List<String> tmp = (List<String>) v;
-            if (null == tmp || tmp.isEmpty()){
-                return defaultConfig.getDefaultCodecs();
+            if (v instanceof Collection){
+                List<String> tmp = (List<String>) v;
+                if (tmp.isEmpty()){
+                    return defaultConfig.getDefaultCodecs();
+                }
+                return v;
             }
-            return v;
+            return defaultConfig.getDefaultCodecs();
         } );
 
-        return deviceInterface.createFile(currentValue);
+        return new Provisioning(deviceInterface.createFile(currentValue), deviceInterface.contentType());
     }
 
 }

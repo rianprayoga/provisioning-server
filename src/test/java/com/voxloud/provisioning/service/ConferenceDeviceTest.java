@@ -1,6 +1,5 @@
 package com.voxloud.provisioning.service;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.voxloud.provisioning.entity.Device;
@@ -19,19 +18,19 @@ import static com.voxloud.provisioning.service.ImportantField.PORT;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class ConferenceGeneratorTest {
+public class ConferenceDeviceTest {
 
-    private static ConferenceGenerator conferenceGenerator;
+    private static ConferenceDevice conferenceDevice;
 
     @BeforeClass
     public static void setup() {
         ObjectMapper mapper = new ObjectMapper();
-        conferenceGenerator = new ConferenceGenerator(mapper);
+        conferenceDevice = new ConferenceDevice(mapper);
     }
 
     @Test
     public void model() {
-        assertEquals(Device.DeviceModel.CONFERENCE.toString(), conferenceGenerator.model());
+        assertEquals(Device.DeviceModel.CONFERENCE.toString(), conferenceDevice.model());
     }
 
     @Test
@@ -42,13 +41,7 @@ public class ConferenceGeneratorTest {
                 + "\"codecs\": [\"G729\",\"OPUS\"]"
                 + "}";
 
-        fragment = "{" + "\"domain\":\"sip.anotherdomain.com\","
-                + "\"port\": null,"
-                + "\"timeout\":10,"
-                + "\"codecs\": [\"G729\",\"OPUS\"]"
-                + "}";
-
-        Map<String, Object> fragmentData = conferenceGenerator.readFragmentData(fragment);
+        Map<String, Object> fragmentData = conferenceDevice.readFragmentData(fragment);
 
         assertEquals(4, fragmentData.size());
         assertTrue(fragmentData.containsKey(DOMAIN));
@@ -62,7 +55,7 @@ public class ConferenceGeneratorTest {
     @Test
     public void readFragmentData_emptyString() throws JsonProcessingException {
         String fragment = "";
-        Map<String, Object> fragmentData = conferenceGenerator.readFragmentData(fragment);
+        Map<String, Object> fragmentData = conferenceDevice.readFragmentData(fragment);
 
         assertEquals(0, fragmentData.size());
     }
@@ -70,7 +63,7 @@ public class ConferenceGeneratorTest {
     @Test
     public void readFragmentData_nullString() throws JsonProcessingException {
         String fragment = null;
-        Map<String, Object> fragmentData = conferenceGenerator.readFragmentData(fragment);
+        Map<String, Object> fragmentData = conferenceDevice.readFragmentData(fragment);
 
         assertEquals(0, fragmentData.size());
     }
@@ -88,8 +81,13 @@ public class ConferenceGeneratorTest {
 
         String expected = "{\"domain\":\"1\",\"port\":\"2\",\"codecs\":[\"3\",\"4\"]}";
 
-        String actual = conferenceGenerator.createFile(value);
+        String actual = conferenceDevice.createFile(value);
 
         assertEquals(expected, actual);
+    }
+
+    @Test
+    public void contentType(){
+        assertEquals("application/json", conferenceDevice.contentType());
     }
 }
